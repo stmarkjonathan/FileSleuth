@@ -1,0 +1,4 @@
+﻿CreateFile
+SetFilePointer
+SetFilePointerEx
+ReadFile

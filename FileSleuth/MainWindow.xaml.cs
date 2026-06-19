@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using FileSleuth.MFTManager;
+using FileSleuth.Model;
+using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +22,8 @@ namespace FileSleuth
         public MainWindow()
         {
             InitializeComponent();
+            Volume foo = new Volume(DriveInfo.GetDrives()[0].Name);
+            MFTFile mftFoo = new MFTFile(foo.volumeHandle);
         }
     }
 }
