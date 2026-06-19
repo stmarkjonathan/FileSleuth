@@ -13,10 +13,27 @@ namespace FileSleuth.MFTManager
     public class MFTFile
     {
 
+        class InvalidDriveException: Exception
+        {
+            public InvalidDriveException()
+            {
+            }
+
+            public InvalidDriveException(string message)
+                : base(message)
+            {
+            }
+
+            public InvalidDriveException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+        }
+
         #region Structs
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private struct BootSector
+        public struct BootSector
         {
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
             public byte[] jump;
@@ -53,8 +70,8 @@ namespace FileSleuth.MFTManager
         const int MFT_FILES_PER_BUFFER = 65536;
 
         SafeFileHandle parentDriveHandle;
-        BootSector bootSector;
-        byte[] mftData;
+        public BootSector bootSector { get; set; }
+        public byte[] mftData { get; set; }
         public MFTFile(SafeFileHandle handle)
         {
 
@@ -75,10 +92,18 @@ namespace FileSleuth.MFTManager
 
             bootSector = BytesToStruct<BootSector>(bootSecBuf);
 
-            return bootSector;
+            if(bootSector.name == "NTFS    ")
+            {
+                return bootSector;
+            }
+            else
+            {
+                throw new InvalidDriveException("The given drive is not an NTFS Drive");
+            }
+
+            
         }
 
-        //when unit testing, check for magic number: 0x454C4946
         private byte[] GetMFTFileRecord()
         {
             byte[] mftFile = new byte[MFT_FILE_SIZE];
