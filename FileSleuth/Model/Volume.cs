@@ -50,7 +50,7 @@ namespace FileSleuth.Model
            return handle;
         }
 
-        public static string ConvertDriveName(string driveName) 
+        private string ConvertDriveName(string driveName) 
         {
             //volumeName format will be "X:\"
 

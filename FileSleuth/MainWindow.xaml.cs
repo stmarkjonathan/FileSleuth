@@ -23,7 +23,10 @@ namespace FileSleuth
         {
             InitializeComponent();
             Volume foo = new Volume(DriveInfo.GetDrives()[0].Name);
-            MFTFile mftFoo = new MFTFile(foo.volumeHandle);
+            MFTFile mftFoo = new MFTFile(foo);
+            DataRunHandler dataRunHandler = new DataRunHandler(mftFoo);
+
+            List<byte[]> data = dataRunHandler.EnumerateDataRuns();
         }
     }
 }
