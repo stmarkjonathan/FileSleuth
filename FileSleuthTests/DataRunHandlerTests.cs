@@ -19,15 +19,13 @@ namespace FileSleuthTests
         public void EnumerateDataRuns_Success()
         {
 
-            uint mftMagicNumber = 0x454C4946;
-
             Volume volume = new Volume(DriveInfo.GetDrives()[0].Name);
             MFTFile mftFile = new MFTFile(volume);
             DataRunHandler dataRunHandler = new DataRunHandler(mftFile);
 
-            List<byte[]> data = dataRunHandler.EnumerateDataRuns();
+            List<ValueTuple<byte[], ulong>> data = dataRunHandler.EnumerateDataRuns();
 
-            Assert.AreEqual(BitConverter.ToUInt32(data[0], 0), mftMagicNumber);
+            Assert.AreEqual(BitConverter.ToUInt32(data[0].Item1, 0), Constants.MFT_MAGIC_NUMBER);
         }
 
     }

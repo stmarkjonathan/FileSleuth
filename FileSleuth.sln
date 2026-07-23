@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSleuth", "FileSleuth\Fi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSleuth_IntegrationTests", "FileSleuthTests\FileSleuth_IntegrationTests.csproj", "{4D5259F8-5FE0-41C9-8B8C-D6A85B201D72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSleuth_UnitTests", "FileSleuth_UnitTests\FileSleuth_UnitTests.csproj", "{BB1A8E7C-B29F-4A92-8814-B6BB8A707CD4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSleuth_UnitTests", "FileSleuth_UnitTests\FileSleuth_UnitTests.csproj", "{B70532C9-908D-41AF-9615-BD044953C07D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{4D5259F8-5FE0-41C9-8B8C-D6A85B201D72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D5259F8-5FE0-41C9-8B8C-D6A85B201D72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D5259F8-5FE0-41C9-8B8C-D6A85B201D72}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB1A8E7C-B29F-4A92-8814-B6BB8A707CD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB1A8E7C-B29F-4A92-8814-B6BB8A707CD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB1A8E7C-B29F-4A92-8814-B6BB8A707CD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB1A8E7C-B29F-4A92-8814-B6BB8A707CD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B70532C9-908D-41AF-9615-BD044953C07D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B70532C9-908D-41AF-9615-BD044953C07D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B70532C9-908D-41AF-9615-BD044953C07D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B70532C9-908D-41AF-9615-BD044953C07D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

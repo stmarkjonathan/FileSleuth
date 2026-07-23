@@ -24,5 +24,22 @@ namespace FileSleuth
             {
             }
         }
+
+        public class InvalidMFTMagicNumberException : Exception
+        {
+            public InvalidMFTMagicNumberException()
+            {
+            }
+
+            public InvalidMFTMagicNumberException(string message)
+                : base(message)
+            {
+            }
+
+            public InvalidMFTMagicNumberException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+        }
     }
 }

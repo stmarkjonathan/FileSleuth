@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileSleuth.FileManager;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -7,10 +8,10 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static FileSleuth.Constants;
 using static FileSleuth.Enums;
 using static FileSleuth.MFTManager.MFTMethods;
 using static FileSleuth.Structs;
-using static FileSleuth.Constants;
 
 namespace FileSleuth.MFTManager
 {
@@ -69,10 +70,9 @@ namespace FileSleuth.MFTManager
             return dataAttribute;
         }
 
-        public List<byte[]> EnumerateDataRuns()
+        public List<ValueTuple<byte[], ulong>> EnumerateDataRuns()
         {
-
-            List<byte[]> dataRunData = new List<byte[]>();
+            List<ValueTuple<byte[], ulong>> dataRunData = new List<ValueTuple<byte[], ulong>>();
             ulong clusterNum = 0;
             byte[] mftBuffer = new byte[MFT_FILES_PER_BUFFER * MFT_FILE_SIZE];
 
@@ -102,7 +102,7 @@ namespace FileSleuth.MFTManager
                     bufferPosition += filesToLoad * MFT_FILE_SIZE;
                     filesRemaining -= filesToLoad;
 
-                    dataRunData.Add(mftBuffer);
+                    dataRunData.Add(ValueTuple.Create((byte[])mftBuffer.Clone(), filesToLoad));
                 }
 
                 dataRunPosition += dataRun.GetRunLength() + dataRun.GetRunOffset() + 1;

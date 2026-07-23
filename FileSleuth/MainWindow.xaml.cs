@@ -1,5 +1,8 @@
-﻿using FileSleuth.MFTManager;
+﻿using FileSleuth.FileManager;
+using FileSleuth.MFTManager;
 using FileSleuth.Model;
+using System.Collections;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -11,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static FileSleuth.Enums;
 
 namespace FileSleuth
 {
@@ -26,7 +30,35 @@ namespace FileSleuth
             MFTFile mftFoo = new MFTFile(foo);
             DataRunHandler dataRunHandler = new DataRunHandler(mftFoo);
 
-            List<byte[]> data = dataRunHandler.EnumerateDataRuns();
+            List<ValueTuple<byte[], ulong>> data = dataRunHandler.EnumerateDataRuns();
+            List<Structs.FileRecordHeader> fileRecordList = new List<Structs.FileRecordHeader>();
+
+            FileRecordHandler fileRecordHandler = new FileRecordHandler();
+
+            foreach (ValueTuple<byte[], ulong> dataRunData in data)
+            {
+                ulong filePos = 0;
+
+                while (filePos < dataRunData.Item2)
+                {
+
+                    Nullable<Structs.FileRecordHeader> fileRecordResult = fileRecordHandler.FindFileRecord(filePos, dataRunData.Item1);
+
+                    if (fileRecordResult.HasValue == false)
+                    {
+                        filePos++;
+                        continue;
+                    }
+
+                    Structs.FileRecordHeader fileRecord = fileRecordResult.Value;
+
+                    fileRecordList.Add((Structs.FileRecordHeader)fileRecord);
+
+                    filePos++;
+                }
+
+                
+            }
         }
     }
 }

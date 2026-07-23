@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FileRecordHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <magicNum>1162627398</magicNum>
+  <updateSequenceOffset>48</updateSequenceOffset>
+  <updateSequenceSize>3</updateSequenceSize>
+  <logSequenceNum>1059281614463</logSequenceNum>
+  <sequenceNum>4</sequenceNum>
+  <hardLinkCount>1</hardLinkCount>
+  <firstAttributeOffset>56</firstAttributeOffset>
+  <flags>3</flags>
+  <realSize>336</realSize>
+  <allocatedSize>1024</allocatedSize>
+  <baseSequenceNum>0</baseSequenceNum>
+  <nextAttributeID>3</nextAttributeID>
+  <unused>0</unused>
+  <recordNum>4330768</recordNum>
+</FileRecordHeader>
