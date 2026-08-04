@@ -151,7 +151,7 @@ namespace FileSleuth
             public ulong allocatedSize;
             public ulong realSize;
             public uint fileProperties;
-            public uint repase;
+            public uint reparse;
             public byte fileNameLength;
             public byte namespaceType;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]

@@ -8,6 +8,7 @@ using static FileSleuth.Enums;
 using static FileSleuth.Structs;
 using static FileSleuth.MFTManager.MFTMethods;
 using static FileSleuth.Constants;
+using static FileSleuth.FileManager.FileManagerObjects;
 
 namespace FileSleuth.FileManager
 {
@@ -42,6 +43,58 @@ namespace FileSleuth.FileManager
                 throw new Exceptions.InvalidMFTMagicNumberException();
             }
             
+        }
+
+        public FileNameAttributeHeader GetFileNameAttribute(byte[] mftBuffer, ushort firstAttributeOffset, ulong filePos, out AttributeListInfo attributeListInfo)
+        {
+            int fileRecordPosition = MFT_FILE_SIZE * (int)filePos;
+            int attributePosition = fileRecordPosition + firstAttributeOffset;
+            attributeListInfo = new AttributeListInfo();
+
+            AttributeHeader attribute = BytesToStruct<AttributeHeader>(mftBuffer[attributePosition..(attributePosition + Marshal.SizeOf(typeof(AttributeHeader)))]);
+            FileNameAttributeHeader fileNameAttribute = new FileNameAttributeHeader();
+
+            while (attributePosition - fileRecordPosition < MFT_FILE_SIZE)
+            {
+
+                if (attribute.attributeType == (uint)AttributeTypes.FileName)
+                {
+                    int fileNameAttributeSize = attributePosition + Marshal.SizeOf(typeof(FileNameAttributeHeader));
+                    fileNameAttribute = BytesToStruct<FileNameAttributeHeader>(mftBuffer[attributePosition..fileNameAttributeSize]);
+
+                    return fileNameAttribute;
+                }
+                else if (attribute.attributeType == (uint)AttributeTypes.AttributeList)
+                {
+                    attributeListInfo.hasAttributeList = true;
+                    attributeListInfo.attributeListPosition = attributePosition;
+
+                    int attributeListSize = attributePosition + Marshal.SizeOf(typeof(ResidentAttributeHeader));
+                    attributeListInfo.attributeListAttribute = BytesToStruct<ResidentAttributeHeader>(mftBuffer[attributePosition..attributeListSize]);                  
+                }
+                else if (attribute.attributeType > (uint)AttributeTypes.FileName)
+                {
+                    break;
+                }
+
+                attributePosition += (int)attribute.length;
+                int attributeEnd = attributePosition + Marshal.SizeOf(typeof(AttributeHeader));
+
+                if ((uint)attributePosition < mftBuffer.Length - 1) //attributePos can get so large it overflows int, so we convert to uint
+                {
+                    attribute = BytesToStruct<AttributeHeader>(mftBuffer[attributePosition..attributeEnd]);
+                }
+                else
+                {
+                    attributePosition = mftBuffer.Length - 1 - Marshal.SizeOf(typeof(AttributeHeader));
+                    attributeEnd = attributePosition + Marshal.SizeOf(typeof(AttributeHeader));
+                    attribute = BytesToStruct<AttributeHeader>(mftBuffer[attributePosition..attributeEnd]);
+                    break;
+                }
+            }           
+
+            return fileNameAttribute;
+
         }
 
     }

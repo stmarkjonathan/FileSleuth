@@ -8,12 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="FileRecordHandler_TestFiles\attributeListFoundByteArray.xml" />
+    <None Remove="FileRecordHandler_TestFiles\fileNameAtrributeNotFoundByteArray.xml" />
+    <None Remove="FileRecordHandler_TestFiles\validFileNameAttributeByteArray.xml" />
     <None Remove="FileRecordHandler_TestFiles\validFileRecord.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="FileRecordHandler_TestFiles\attributeListFoundByteArray.xml" />
+    <EmbeddedResource Include="FileRecordHandler_TestFiles\fileNameAtrributeNotFoundByteArray.xml" />
     <EmbeddedResource Include="FileRecordHandler_TestFiles\invalidFileRecord.xml" />
     <EmbeddedResource Include="FileRecordHandler_TestFiles\fileRecord_NotInUse.xml" />
+    <EmbeddedResource Include="FileRecordHandler_TestFiles\validFileNameAttributeByteArray.xml" />
     <EmbeddedResource Include="FileRecordHandler_TestFiles\validFileRecord.xml" />
   </ItemGroup>
 

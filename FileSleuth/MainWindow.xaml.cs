@@ -15,6 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static FileSleuth.Enums;
+using static FileSleuth.FileManager.FileManagerObjects;
+using static FileSleuth.Structs;
 
 namespace FileSleuth
 {
@@ -31,7 +33,6 @@ namespace FileSleuth
             DataRunHandler dataRunHandler = new DataRunHandler(mftFoo);
 
             List<ValueTuple<byte[], ulong>> data = dataRunHandler.EnumerateDataRuns();
-            List<Structs.FileRecordHeader> fileRecordList = new List<Structs.FileRecordHeader>();
 
             FileRecordHandler fileRecordHandler = new FileRecordHandler();
 
@@ -42,7 +43,7 @@ namespace FileSleuth
                 while (filePos < dataRunData.Item2)
                 {
 
-                    Nullable<Structs.FileRecordHeader> fileRecordResult = fileRecordHandler.FindFileRecord(filePos, dataRunData.Item1);
+                    Nullable<FileRecordHeader> fileRecordResult = fileRecordHandler.FindFileRecord(filePos, dataRunData.Item1);
 
                     if (fileRecordResult.HasValue == false)
                     {
@@ -50,15 +51,20 @@ namespace FileSleuth
                         continue;
                     }
 
-                    Structs.FileRecordHeader fileRecord = fileRecordResult.Value;
+                    FileRecordHeader fileRecord = fileRecordResult.Value;
 
-                    fileRecordList.Add((Structs.FileRecordHeader)fileRecord);
+                    FileNameAttributeHeader fileNameAttribute = fileRecordHandler.GetFileNameAttribute(
+                        dataRunData.Item1, fileRecord.firstAttributeOffset, filePos, out AttributeListInfo hasAttributeList);
+
+                    //need to still check for namespace 2 etc. in another method
 
                     filePos++;
+
                 }
 
                 
             }
+
         }
     }
 }
