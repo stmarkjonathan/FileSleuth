@@ -45,7 +45,7 @@ namespace FileSleuth.FileManager
             
         }
 
-        public FileNameAttributeHeader GetFileNameAttribute(byte[] mftBuffer, ushort firstAttributeOffset, ulong filePos, out AttributeListInfo attributeListInfo)
+        public (FileNameAttributeHeader fileNameAttribute, int attributePosition) GetFileNameAttribute(byte[] mftBuffer, ushort firstAttributeOffset, ulong filePos, out AttributeListInfo attributeListInfo)
         {
             int fileRecordPosition = MFT_FILE_SIZE * (int)filePos;
             int attributePosition = fileRecordPosition + firstAttributeOffset;
@@ -62,7 +62,7 @@ namespace FileSleuth.FileManager
                     int fileNameAttributeSize = attributePosition + Marshal.SizeOf(typeof(FileNameAttributeHeader));
                     fileNameAttribute = BytesToStruct<FileNameAttributeHeader>(mftBuffer[attributePosition..fileNameAttributeSize]);
 
-                    return fileNameAttribute;
+                    return (fileNameAttribute, attributePosition);
                 }
                 else if (attribute.attributeType == (uint)AttributeTypes.AttributeList)
                 {
@@ -93,9 +93,26 @@ namespace FileSleuth.FileManager
                 }
             }           
 
-            return fileNameAttribute;
+            return (fileNameAttribute, 0);
 
         }
 
+        public FileData GetFileData(FileRecordHeader fileRecord, FileNameAttributeHeader fileNameAttribute, int attributePosition, byte[] mftBuffer)
+        {
+            FileData file = new FileData();
+
+            int attributeSize = attributePosition + Marshal.SizeOf(typeof(FileNameAttributeHeader));
+
+            int fileNameStart = attributeSize - 1;
+            int fileNameEnd = fileNameStart + fileNameAttribute.fileNameLength * 2;
+
+            char[] chars = Encoding.Unicode.GetString(mftBuffer[fileNameStart..fileNameEnd]).ToCharArray();
+
+            file.ParentIndex = fileNameAttribute.GetParentRecordNumber();
+            file.FileIndex = fileRecord.recordNum;
+            file.FileName = new string(chars);
+
+            return file;
+        }
     }
 }

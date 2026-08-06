@@ -176,7 +176,7 @@ namespace FileSleuth_UnitTests
             
 
             FileRecordHandler fileHandler = new FileRecordHandler();
-            FileNameAttributeHeader fileNameAttribute = fileHandler.GetFileNameAttribute(array, testFirstAttributeOffset, testFilePos, out AttributeListInfo _);
+            (FileNameAttributeHeader fileNameAttribute, int attributePosition) = fileHandler.GetFileNameAttribute(array, testFirstAttributeOffset, testFilePos, out AttributeListInfo _);
 
 
             Assert.IsTrue(fileNameAttribute.attributeType == (uint)AttributeTypes.FileName);        
@@ -194,7 +194,7 @@ namespace FileSleuth_UnitTests
 
 
             FileRecordHandler fileHandler = new FileRecordHandler();
-            FileNameAttributeHeader fileNameAttribute = fileHandler.GetFileNameAttribute(array, testFirstAttributeOffset, testFilePos, out AttributeListInfo info);
+            (FileNameAttributeHeader fileNameAttribute, int attributePosition) = fileHandler.GetFileNameAttribute(array, testFirstAttributeOffset, testFilePos, out AttributeListInfo info);
 
 
             Assert.IsTrue(info.hasAttributeList);
@@ -212,11 +212,10 @@ namespace FileSleuth_UnitTests
 
 
             FileRecordHandler fileHandler = new FileRecordHandler();
-            FileNameAttributeHeader fileNameAttribute = fileHandler.GetFileNameAttribute(array, testFirstAttributeOffset, testFilePos, out AttributeListInfo info);
+            (FileNameAttributeHeader fileNameAttribute, int attributePosition) = fileHandler.GetFileNameAttribute(array, testFirstAttributeOffset, testFilePos, out AttributeListInfo info);
 
 
-            Assert.IsTrue(!info.hasAttributeList && fileNameAttribute.attributeType == 0);
+            Assert.IsTrue(!info.hasAttributeList && fileNameAttribute.Equals(default(FileNameAttributeHeader)));
         }
-
     }
 }

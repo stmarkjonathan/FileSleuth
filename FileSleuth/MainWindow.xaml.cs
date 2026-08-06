@@ -32,18 +32,18 @@ namespace FileSleuth
             MFTFile mftFoo = new MFTFile(foo);
             DataRunHandler dataRunHandler = new DataRunHandler(mftFoo);
 
-            List<ValueTuple<byte[], ulong>> data = dataRunHandler.EnumerateDataRuns();
+            List<(byte[] mftBuffer, ulong filesToLoad)> data = dataRunHandler.EnumerateDataRuns();
 
             FileRecordHandler fileRecordHandler = new FileRecordHandler();
 
-            foreach (ValueTuple<byte[], ulong> dataRunData in data)
+            foreach ((byte[] mftBuffer, ulong filesToLoad) dataRunData in data)
             {
                 ulong filePos = 0;
 
-                while (filePos < dataRunData.Item2)
+                while (filePos < dataRunData.filesToLoad)
                 {
 
-                    Nullable<FileRecordHeader> fileRecordResult = fileRecordHandler.FindFileRecord(filePos, dataRunData.Item1);
+                    Nullable<FileRecordHeader> fileRecordResult = fileRecordHandler.FindFileRecord(filePos, dataRunData.mftBuffer);
 
                     if (fileRecordResult.HasValue == false)
                     {
@@ -53,10 +53,23 @@ namespace FileSleuth
 
                     FileRecordHeader fileRecord = fileRecordResult.Value;
 
-                    FileNameAttributeHeader fileNameAttribute = fileRecordHandler.GetFileNameAttribute(
-                        dataRunData.Item1, fileRecord.firstAttributeOffset, filePos, out AttributeListInfo hasAttributeList);
+                    (FileNameAttributeHeader fileNameAttribute, int attributePosition)  = fileRecordHandler.GetFileNameAttribute(
+                        dataRunData.mftBuffer, fileRecord.firstAttributeOffset, filePos, out AttributeListInfo attributeListInfo);
 
-                    //need to still check for namespace 2 etc. in another method
+                    if (fileNameAttribute.namespaceType != 2)
+                    {
+                        if (!fileNameAttribute.Equals(default(FileNameAttributeHeader)) && fileNameAttribute.nonResident == 0)
+                        {
+                            FileData file = fileRecordHandler.GetFileData(fileRecord, fileNameAttribute, attributePosition, dataRunData.mftBuffer);                       
+                        }
+
+                    }
+
+
+                    if (attributeListInfo.hasAttributeList)
+                    {
+                        
+                    }
 
                     filePos++;
 

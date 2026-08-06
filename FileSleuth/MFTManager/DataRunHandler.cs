@@ -70,9 +70,9 @@ namespace FileSleuth.MFTManager
             return dataAttribute;
         }
 
-        public List<ValueTuple<byte[], ulong>> EnumerateDataRuns()
+        public List<(byte[] mftBuffer, ulong filesToLoad)> EnumerateDataRuns()
         {
-            List<ValueTuple<byte[], ulong>> dataRunData = new List<ValueTuple<byte[], ulong>>();
+            List<(byte[] mftBuffer, ulong filesToLoad)> dataRunData = new List<(byte[] mftBuffer, ulong filesToLoad)>();
             ulong clusterNum = 0;
             byte[] mftBuffer = new byte[MFT_FILES_PER_BUFFER * MFT_FILE_SIZE];
 
