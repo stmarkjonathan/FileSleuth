@@ -2,3 +2,6 @@
 SetFilePointer
 SetFilePointerEx
 ReadFile
+GetFinalPathNameByHandle
+MAX_PATH
+

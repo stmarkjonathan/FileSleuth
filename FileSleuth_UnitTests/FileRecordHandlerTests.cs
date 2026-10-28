@@ -13,6 +13,7 @@ using System.Xml.Serialization;
 using static FileSleuth.Enums;
 using static FileSleuth.FileManager.FileManagerObjects;
 using static FileSleuth.MFTManager.MFTMethods;
+using static FileSleuth.MFTManager.MFTObjects;
 using static FileSleuth.Structs;
 
 namespace FileSleuth_UnitTests
@@ -20,50 +21,7 @@ namespace FileSleuth_UnitTests
 
     [TestClass]
     public class FileHandlerTests
-    {
-
-        private T DeserializeXMLToObject<T>(string xmlResourcePath) where T : new()
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            string[] names = assembly.GetManifestResourceNames();
-            XmlDocument xml = new XmlDocument();
-            Stream? stream = null;
-
-            stream = assembly.GetManifestResourceStream(xmlResourcePath);
-
-            if (stream != null)
-            {
-                using (stream)
-                {
-                    xml.Load(stream);
-                }
-            }
-            else
-            {
-                Assert.Fail("XML Test File not loaded: " + xmlResourcePath);
-            }
-
-            T xmlResultObject = new T();
-
-            using (XmlReader reader = new XmlNodeReader(xml))
-            {
-                var serializer = new XmlSerializer(typeof(T));
-
-                object? result = serializer.Deserialize(reader);
-
-                if (result != null)
-                {
-                    xmlResultObject = (T)result;
-                }
-                else
-                {
-                    Assert.Fail("Failed to deserialize file into " + xmlResultObject.GetType() + " from: " + xmlResourcePath);
-                }
-            }
-
-            return xmlResultObject;
-        }
-
+    {      
         private T DeserializeXMLToPrimitive<T>(string xmlResourcePath)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -117,14 +75,15 @@ namespace FileSleuth_UnitTests
         {
 
             string xmlTestFile = "FileSleuth_UnitTests.FileRecordHandler_TestFiles.validFileRecord.xml";
-            FileRecordHeader fileRecordHeader = DeserializeXMLToObject<FileRecordHeader>(xmlTestFile);
+            ulong testFilePos = 0;
+            byte[] testBuffer = DeserializeXMLToPrimitive<byte[]>(xmlTestFile);
 
             FileRecordHandler fileHandler = new FileRecordHandler();
-            Nullable<FileRecordHeader> fileRecord = fileHandler.FindFileRecord(0, StructToBytes<FileRecordHeader>(fileRecordHeader));
+            FileRecord fileRecord = fileHandler.FindFileRecord(testFilePos, testBuffer);
 
-            if(fileRecord != null)
+            if(fileRecord.fileRecordHeader != null)
             {
-                Assert.AreEqual(Constants.MFT_MAGIC_NUMBER, fileRecord.Value.magicNum);
+                Assert.AreEqual(Constants.MFT_MAGIC_NUMBER, fileRecord.fileRecordHeader.Value.magicNum);
             }
             else
             {
@@ -133,22 +92,17 @@ namespace FileSleuth_UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exceptions.InvalidMFTMagicNumberException),
-        "File Record with Invalid Magic Number did not throw error")]
         public void FileRecordHandler_FindFileRecord_InvalidMagicNum()
         {
 
             string xmlTestFile = "FileSleuth_UnitTests.FileRecordHandler_TestFiles.invalidFileRecord.xml";
-            FileRecordHeader fileRecordHeader = DeserializeXMLToObject<FileRecordHeader>(xmlTestFile);
+
+            ulong testFilePos = 0;
+            byte[] testBuffer = DeserializeXMLToPrimitive<byte[]>(xmlTestFile);
 
             FileRecordHandler fileHandler = new FileRecordHandler();
 
-            Nullable<FileRecordHeader> fileRecord = fileHandler.FindFileRecord(0, StructToBytes<FileRecordHeader>(fileRecordHeader));
-
-            if (fileRecord == null)
-            {
-                throw new ArgumentNullException(nameof(fileRecord));
-            }
+            Assert.ThrowsExactly<Exceptions.InvalidMFTMagicNumberException>(() => fileHandler.FindFileRecord(testFilePos, testBuffer));
         }
 
         [TestMethod]
@@ -156,12 +110,14 @@ namespace FileSleuth_UnitTests
         {
 
             string xmlTestFile = "FileSleuth_UnitTests.FileRecordHandler_TestFiles.fileRecord_NotInUse.xml";
-            FileRecordHeader fileRecordHeader = DeserializeXMLToObject<FileRecordHeader>(xmlTestFile);
+            ulong testFilePos = 34;
+            byte[] testBuffer = DeserializeXMLToPrimitive<byte[]>(xmlTestFile);
+            
 
             FileRecordHandler fileHandler = new FileRecordHandler();
-            Nullable<FileRecordHeader> fileRecord = fileHandler.FindFileRecord(0, StructToBytes<FileRecordHeader>(fileRecordHeader));
+            FileRecord fileRecord = fileHandler.FindFileRecord(testFilePos, testBuffer);
 
-            Assert.IsNull(fileRecord);
+            Assert.IsNull(fileRecord.fileRecordHeader);
         }
 
         [TestMethod]
@@ -217,5 +173,27 @@ namespace FileSleuth_UnitTests
 
             Assert.IsTrue(!info.hasAttributeList && fileNameAttribute.Equals(default(FileNameAttributeHeader)));
         }
+
+        [TestMethod]
+        public void FileRecordHandler_GetFileData()
+        {
+            string xmlTestFile = "FileSleuth_UnitTests.FileRecordHandler_TestFiles.validFileData.xml";
+
+            byte[] array = DeserializeXMLToPrimitive<byte[]>(xmlTestFile);
+
+            FileRecordHandler fileRecordHandler = new FileRecordHandler();
+            FileRecord fileRecord = new FileRecord();
+            fileRecord.fileRecordHeader = new FileRecordHeader();
+            fileRecord.fixupArray = [221, 21, 29];
+            FileNameAttributeHeader fileNameAttribute = new FileNameAttributeHeader();
+
+            int attributePosition = 152;
+            fileNameAttribute.fileNameLength = 4;
+            fileNameAttribute.parentRecordNumber = new byte[6];
+
+            FileData file = fileRecordHandler.GetFileData(fileRecord, fileNameAttribute, attributePosition, array);
+
+            Assert.AreEqual("$MFT", file.FileName);
+        }    
     }
 }

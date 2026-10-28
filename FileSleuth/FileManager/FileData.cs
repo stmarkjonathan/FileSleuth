@@ -12,12 +12,14 @@ namespace FileSleuth.FileManager
         public ulong ParentIndex { get; set; }
         public ulong FileIndex { get; set; }
         public string FileName { get; set; }
+        public string FilePath { get; set; }
 
         public FileData()
         {
             ParentIndex = 0;
             FileIndex = 0;
             FileName = "";
+            FilePath = "";
         }
 
         public override string ToString()

@@ -142,8 +142,8 @@ namespace FileSleuth
             // parentRecordNumber is supposed to be a 6 byte long value,
             // but since C# doesn't have bitfields, we opt for a 6 byte array
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
-            byte[] parentRecordNumber;
-            public ushort sequenceNumber;
+            public byte[] parentRecordNumber;
+            public ushort parentSequenceNumber;
             public ulong creationTime;
             public ulong modificationTime;
             public ulong metadataModificationTime;

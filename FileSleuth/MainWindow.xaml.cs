@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static FileSleuth.Enums;
 using static FileSleuth.FileManager.FileManagerObjects;
+using static FileSleuth.MFTManager.MFTObjects;
 using static FileSleuth.Structs;
 
 namespace FileSleuth
@@ -28,12 +29,16 @@ namespace FileSleuth
         public MainWindow()
         {
             InitializeComponent();
-            Volume foo = new Volume(DriveInfo.GetDrives()[0].Name);
+
+            string driveName = DriveInfo.GetDrives()[0].Name;
+
+            Volume foo = new Volume(driveName);
             MFTFile mftFoo = new MFTFile(foo);
             DataRunHandler dataRunHandler = new DataRunHandler(mftFoo);
 
             List<(byte[] mftBuffer, ulong filesToLoad)> data = dataRunHandler.EnumerateDataRuns();
-
+            Dictionary<ulong, ulong> extensionRecordNums = new Dictionary<ulong, ulong>();
+            Dictionary<ulong, FileData> filesDict = new Dictionary<ulong, FileData>();
             FileRecordHandler fileRecordHandler = new FileRecordHandler();
 
             foreach ((byte[] mftBuffer, ulong filesToLoad) dataRunData in data)
@@ -43,39 +48,45 @@ namespace FileSleuth
                 while (filePos < dataRunData.filesToLoad)
                 {
 
-                    Nullable<FileRecordHeader> fileRecordResult = fileRecordHandler.FindFileRecord(filePos, dataRunData.mftBuffer);
+                    FileRecord fileRecord = fileRecordHandler.FindFileRecord(filePos, dataRunData.mftBuffer);
 
-                    if (fileRecordResult.HasValue == false)
+                    if (fileRecord.fileRecordHeader.HasValue == false)
                     {
                         filePos++;
                         continue;
                     }
 
-                    FileRecordHeader fileRecord = fileRecordResult.Value;
+                    FileRecordHeader fileRecordHeader = fileRecord.fileRecordHeader.Value;
 
-                    (FileNameAttributeHeader fileNameAttribute, int attributePosition)  = fileRecordHandler.GetFileNameAttribute(
-                        dataRunData.mftBuffer, fileRecord.firstAttributeOffset, filePos, out AttributeListInfo attributeListInfo);
+                    (FileNameAttributeHeader fileNameAttribute, int attributePosition) = fileRecordHandler.GetFileNameAttribute(
+                        dataRunData.mftBuffer, fileRecordHeader.firstAttributeOffset, filePos, out AttributeListInfo attributeListInfo);
 
-                    if (fileNameAttribute.namespaceType != 2)
+                    if (!fileNameAttribute.Equals(default(FileNameAttributeHeader)))
                     {
-                        if (!fileNameAttribute.Equals(default(FileNameAttributeHeader)) && fileNameAttribute.nonResident == 0)
-                        {
-                            FileData file = fileRecordHandler.GetFileData(fileRecord, fileNameAttribute, attributePosition, dataRunData.mftBuffer);                       
-                        }
-
+                        FileData file = fileRecordHandler.GetFileData(fileRecord, fileNameAttribute, attributePosition, dataRunData.mftBuffer);
+                        filesDict[file.FileIndex] = file;
                     }
-
 
                     if (attributeListInfo.hasAttributeList)
                     {
-                        
+                        fileRecordHandler.GetAttributeListFileNameEntry(dataRunData.mftBuffer, attributeListInfo.attributeListAttribute,
+                            extensionRecordNums, fileRecordHeader.recordNum, attributeListInfo.attributeListPosition);
                     }
 
                     filePos++;
 
                 }
 
-                
+                filesDict[5].FileName = driveName.Substring(0, driveName.Length - 1);            
+            }
+
+            foreach (var file in filesDict.Values)
+            {
+                if (file != null)
+                {
+                    file.FilePath = fileRecordHandler.GetFilePath(file, filesDict, extensionRecordNums).ToString();
+                }
+
             }
 
         }

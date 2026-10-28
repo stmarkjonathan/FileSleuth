@@ -25,7 +25,7 @@ namespace FileSleuthTests
 
             List<ValueTuple<byte[], ulong>> data = dataRunHandler.EnumerateDataRuns();
 
-            Assert.AreEqual(BitConverter.ToUInt32(data[0].Item1, 0), Constants.MFT_MAGIC_NUMBER);
+            Assert.AreEqual(Constants.MFT_MAGIC_NUMBER, BitConverter.ToUInt32(data[0].Item1, 0));
         }
 
     }
