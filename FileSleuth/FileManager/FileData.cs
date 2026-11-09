@@ -21,10 +21,5 @@ namespace FileSleuth.FileManager
             FileName = "";
             FilePath = "";
         }
-
-        public override string ToString()
-        {
-            return FileName;
-        }
     }
 }
