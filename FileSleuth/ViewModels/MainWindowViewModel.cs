@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FileSleuth.FileIndexManager;
 using FileSleuth.FileManager;
 using FileSleuth.MFTManager;
 using FileSleuth.Model;
@@ -15,13 +16,21 @@ namespace FileSleuth.ViewModels
     internal partial class MainWindowViewModel : ObservableObject
     {      
         private List<FileData> filesList;
+
+        private Dictionary<string, FileData> fileIndex;
+
         [ObservableProperty]
         private ObservableCollection<FileData> displayList;
+
+        [ObservableProperty]
+        private string searchQuery;
+
         public MainWindowViewModel() 
         {
             filesList = new List<FileData>();
+            searchQuery = string.Empty;
             DisplayList = new ObservableCollection<FileData>();
-
+            fileIndex = FileIndexHandler.IndexFiles(filesList);
         }
 
         [RelayCommand]
@@ -30,6 +39,27 @@ namespace FileSleuth.ViewModels
             string driveName = DriveInfo.GetDrives()[0].Name;
             filesList = new List<FileData>(await Task.Run(() => InitializeFileDictionary(driveName).Values));
             DisplayList = new ObservableCollection<FileData>(filesList);
+            fileIndex = FileIndexHandler.IndexFiles(filesList);
+        }
+
+        public List<FileData> SearchFiles()
+        {
+
+            List<FileData> foundFiles = new List<FileData>();
+
+            if (!String.IsNullOrWhiteSpace(SearchQuery))
+            {
+
+                foreach (FileData file in fileIndex.Values)
+                {
+                    if (file.FileName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+                    {
+                        foundFiles.Add(file);
+                    }
+                }
+            }
+
+            return foundFiles;
         }
 
         private Dictionary<ulong, FileData> InitializeFileDictionary(string driveName)
