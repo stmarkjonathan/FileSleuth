@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace FileSleuth.FileManager
 {
@@ -13,6 +14,7 @@ namespace FileSleuth.FileManager
         public ulong FileIndex { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
+        public BitmapSource? FileIcon { get; set; }
 
         public FileData()
         {

@@ -19,6 +19,8 @@ namespace FileSleuth.ViewModels
 
         private Dictionary<string, FileData> fileIndex;
 
+        private FileIconHandler fileIconHandler;
+
         [ObservableProperty]
         private ObservableCollection<FileData> displayList;
 
@@ -28,6 +30,7 @@ namespace FileSleuth.ViewModels
         public MainWindowViewModel() 
         {
             filesList = new List<FileData>();
+            fileIconHandler = new FileIconHandler();
             searchQuery = string.Empty;
             DisplayList = new ObservableCollection<FileData>();
             fileIndex = FileIndexHandler.IndexFiles(filesList);
@@ -117,6 +120,7 @@ namespace FileSleuth.ViewModels
                 if (file != null)
                 {
                     file.FilePath = fileRecordHandler.GetFilePath(file, filesDict, extensionRecordNums).ToString();
+                    fileIconHandler.TestIcon(file);                                                                                                                 
                 }
 
             }

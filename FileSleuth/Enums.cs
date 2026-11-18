@@ -50,5 +50,14 @@ namespace FileSleuth
             EndMarker = 0xFFFFFFFF,
         }
 
+        public enum HResult : uint
+        {
+            S_OK = 0x00000000,
+            E_ABORT = 0x80004004,
+            E_ACCESSDENIED = 0x80070005,
+            E_FAIL = 0x80004005,
+            E_PENDING = 0x8000000A
+        }
+
     }
 }

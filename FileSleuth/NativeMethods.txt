@@ -4,4 +4,6 @@ SetFilePointerEx
 ReadFile
 GetFinalPathNameByHandle
 MAX_PATH
-
+SHGetFileInfo
+SHCreateItemFromParsingName
+IShellItemImageFactory

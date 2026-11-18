@@ -34,6 +34,15 @@
                   CanUserDeleteRows="False"
                   CanUserSortColumns="False">
             <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding FileIcon}"
+                                   RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                   RenderOptions.EdgeMode="Aliased" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="File Name"
                                     Width="*"
                                     Binding="{Binding FileName}"></DataGridTextColumn>

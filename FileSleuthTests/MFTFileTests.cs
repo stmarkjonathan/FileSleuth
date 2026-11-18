@@ -17,7 +17,7 @@ namespace FileSleuthTests
             Volume foo = new Volume(DriveInfo.GetDrives()[0].Name);
             MFTFile mftFile = new MFTFile(foo);
 
-            Assert.AreEqual(mftFile.bootSector.name, "NTFS    ");
+            Assert.AreEqual("NTFS    ", mftFile.bootSector.name);
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace FileSleuthTests
         {
             Volume foo = new Volume(DriveInfo.GetDrives()[0].Name);
             MFTFile mftFile = new MFTFile(foo);
-            Assert.AreEqual(mftFile.mftFileRecord.magicNum, (uint)0x454C4946);
+            Assert.AreEqual((uint)0x454C4946, mftFile.mftFileRecord.magicNum);
         }
         
     }
