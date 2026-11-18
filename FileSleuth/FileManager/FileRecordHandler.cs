@@ -38,9 +38,7 @@ namespace FileSleuth.FileManager
             FileRecordHeader fileRecordHeader =
                 BytesToStruct<FileRecordHeader>(mftBuffer[fileRecordPosition..(fileRecordPosition + Marshal.SizeOf(typeof(FileRecordHeader)))]);
 
-
-
-            if ((fileRecordHeader.flags & (ushort)FileRecordFlags.InUse) != 1)
+            if ((fileRecordHeader.flags & FileRecordFlags.InUse) != FileRecordFlags.InUse)
             {
                 fileRecord.fileRecordHeader = null;
                 return fileRecord;
@@ -127,6 +125,9 @@ namespace FileSleuth.FileManager
 
             if (fileRecord.fileRecordHeader.HasValue)
             {
+
+                FileRecordHeader fileRecordHeader = fileRecord.fileRecordHeader.Value;
+
                 int attributeSize = attributePosition + Marshal.SizeOf(typeof(FileNameAttributeHeader));
 
                 int fileNameStart = attributeSize - 1;
@@ -151,13 +152,18 @@ namespace FileSleuth.FileManager
                 string s = Encoding.Unicode.GetString(mftBuffer[fileNameStart..fileNameEnd]);
 
                 file.ParentIndex = fileNameAttribute.GetParentRecordNumber();
-                file.FileIndex = fileRecord.fileRecordHeader.Value.recordNum;
+                file.FileIndex = fileRecordHeader.recordNum;
                 file.FileName = s;
+
+                if ((fileRecordHeader.flags & FileRecordFlags.IsDirectory) == FileRecordFlags.IsDirectory)
+                {
+                    file.IsDirectory = true;
+                }
             }
 
             return file;
         }
-        //unit test
+
         public void GetAttributeListFileNameEntry(byte[] mftBuffer, ResidentAttributeHeader attributeListAttribute, Dictionary<ulong, ulong> extensionRecordNums, ulong fileRecordNumber, int attributePosition)
         {
             int attributeListStart = attributePosition;

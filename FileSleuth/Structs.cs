@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static FileSleuth.Enums;
 
 namespace FileSleuth
 {
@@ -52,7 +53,7 @@ namespace FileSleuth
             public ushort sequenceNum;
             public ushort hardLinkCount;
             public ushort firstAttributeOffset;
-            public ushort flags;
+            public FileRecordFlags flags;
             public uint realSize;
             public uint allocatedSize;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]

@@ -11,6 +11,7 @@ namespace FileSleuth.FileManager
     public class FileData
     {
         public ulong ParentIndex { get; set; }
+        public bool IsDirectory {  get; set; }
         public ulong FileIndex { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
@@ -22,6 +23,7 @@ namespace FileSleuth.FileManager
             FileIndex = 0;
             FileName = "";
             FilePath = "";
+            IsDirectory = false;
         }
     }
 }

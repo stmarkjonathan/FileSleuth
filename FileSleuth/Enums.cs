@@ -14,7 +14,7 @@ namespace FileSleuth
         }
 
         [Flags]
-        public enum FileRecordFlags
+        public enum FileRecordFlags : ushort
         {
             InUse = 0x01,
             IsDirectory = 0x02,

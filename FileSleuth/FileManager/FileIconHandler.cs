@@ -11,9 +11,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.Storage.FileSystem;
-using Windows.Win32.System.Com;
 using Windows.Win32.UI.Shell;
 
 namespace FileSleuth.FileManager
@@ -23,47 +21,44 @@ namespace FileSleuth.FileManager
         Dictionary<string, BitmapSource> extensionIconSrcs;
         public FileIconHandler()
         {
-           extensionIconSrcs = new Dictionary<string, BitmapSource>();
+            extensionIconSrcs = new Dictionary<string, BitmapSource>();
         }
 
-        public void TestIcon(FileData fileInfo)
+        public void TestIcon(FileData file)
         {
-
-            string filePath = fileInfo.FilePath;
+            string filePath = file.FilePath;
 
             string pathExtension = Path.GetExtension(filePath);
 
-            if(extensionIconSrcs.ContainsKey(pathExtension))
+            if (extensionIconSrcs.ContainsKey(pathExtension))
             {
-                fileInfo.FileIcon = extensionIconSrcs[pathExtension];
+                file.FileIcon = extensionIconSrcs[pathExtension];
                 return;
             }
 
-            IShellItemImageFactory shellImageFactory;
+            SHFILEINFOW shFileInfo = new SHFILEINFOW();
 
-            SIZE iconSize = new SIZE(16, 16);
+            FILE_FLAGS_AND_ATTRIBUTES shgi_attributes;
 
-            DeleteObjectHBITMAPSafeHandle iconBitmap;
+            if (file.IsDirectory)
+                shgi_attributes = FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_DIRECTORY;
+            else
+                shgi_attributes = FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_NORMAL;
 
-            //this is very memory heavy, maybe dictionary / cache aleayd seen icons
-            //if hresult not succeed, use default
-            HRESULT shellImageFactory_hResult = PInvoke.SHCreateItemFromParsingName(filePath, null, out shellImageFactory);
+            nuint success = PInvoke.SHGetFileInfo(filePath,
+                shgi_attributes,
+                ref shFileInfo,
+                SHGFI_FLAGS.SHGFI_ICON | SHGFI_FLAGS.SHGFI_SMALLICON | SHGFI_FLAGS.SHGFI_USEFILEATTRIBUTES);
 
-            if (shellImageFactory_hResult.Succeeded)
+            if (success != 0)
             {
-                shellImageFactory.GetImage(iconSize, SIIGBF.SIIGBF_ICONONLY, out iconBitmap);
-
-                BitmapSource iconSrc = Imaging.CreateBitmapSourceFromHBitmap(iconBitmap.DangerousGetHandle(),
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
+                BitmapSource iconSrc = Imaging.CreateBitmapSourceFromHIcon(shFileInfo.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
                 iconSrc.Freeze();
 
-                fileInfo.FileIcon = iconSrc;
+                file.FileIcon = iconSrc;
                 extensionIconSrcs[pathExtension] = iconSrc;
-
-                iconBitmap.Close();
+                PInvoke.DestroyIcon(shFileInfo.hIcon);
             }
         }
     }
